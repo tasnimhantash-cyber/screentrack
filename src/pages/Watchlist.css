@@ -1,0 +1,265 @@
+body {
+  background: #f6f7fb;
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  color: #222;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.sort-controls {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.show-card {
+  background: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.show-card img {
+  border-radius: 12px;
+  margin: 10px 0;
+  width: 180px;
+  height: auto;
+  object-fit: cover;
+}
+
+.episode-note-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.episode-note-input select,
+.episode-note-input textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.episode-note-input textarea {
+  flex: 1;
+  min-width: 200px;
+  min-height: 40px;
+  resize: none;
+}
+
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #357ab8;
+}
+
+.remove-btn {
+  background: #e74c3c;
+  margin-top: 10px;
+}
+
+.remove-btn:hover {
+  background: #c0392b;
+}
+.notes-list {
+  margin-top: 1rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  text-align: left;
+}
+
+.note-item {
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.note-item:last-child {
+  border-bottom: none;
+}
+.note-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.note-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.note-buttons button {
+  background: #f1f1f1;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.note-buttons button:hover {
+  background: #ddd;
+}
+
+.note-item textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.season-block {
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.season-header {
+  padding: 10px;
+  background: #f0f0f0;
+  cursor: pointer;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.season-notes {
+  padding: 10px;
+}
+.note-date {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 4px;
+}
+.note-date {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 3px;
+}
+.note-meta p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+.note-meta small {
+  color: gray;
+  font-size: 0.8rem;
+}
+.note-meta p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+.note-meta small {
+  color: gray;
+  font-size: 0.8rem;
+}
+.note-rating,
+.show-rating {
+  margin-top: 8px;
+}
+.show-card {
+  transition: transform 0.15s ease;
+}
+.show-card:hover {
+  transform: scale(1.02);
+}
+.current-watching {
+  margin-bottom: 25px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+/* outer page container */
+.watchlist-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* page header */
+.watchlist-header {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #dcdcdc;
+  padding-bottom: 10px;
+}
+
+/* each category row (Currently Watching, Plan to Watch, Completed) */
+.watchlist-row {
+  margin-bottom: 40px;
+}
+
+/* row title */
+.row-title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-left: 4px solid #999;
+  padding-left: 8px;
+}
+
+/* the cards container for that row */
+.row-cards {
+  display: flex;
+  flex-wrap: wrap;         /* wrap to next line if too many cards */
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* make sure cards have a consistent width so they line up nicely */
+.show-card {
+  width: 220px;            /* you can adjust this */
+  background: #fff;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 12px;
+}
+.star-empty:hover,
+.star-full:hover {
+  transform: scale(1.15);
+}
