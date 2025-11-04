@@ -65,24 +65,47 @@ export const deleteShow = async (id) => {
 export const getShowWithNotes = async (id) => {
   const showRef = doc(db, "watchlist", id);
   const showSnap = await getDoc(showRef);
+
   if (!showSnap.exists()) return null;
 
-  const notesSnap = await getDocs(collection(showRef, "episodeNotes"));
-  const notes = notesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const showData = { id: showSnap.id, ...showSnap.data() };
 
-  return { id: showSnap.id, ...showSnap.data(), notes };
+  // 🔹 Choose correct subcollection
+  const notesCollection = collection(
+    showRef,
+    showData.type === "tv" ? "episodes" : "notes"
+  );
+
+  const notesSnap = await getDocs(notesCollection);
+  const notes = notesSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  return { ...showData, notes };
 };
 
-// 🔹 Add new episode note
-export const addEpisodeNote = async (showId, noteData) => {
+// 🔹 Add new note (handles both movies and TV shows)
+export const addNote = async (showId, showType, noteData) => {
   const showRef = doc(db, "watchlist", showId);
-  const notesRef = collection(showRef, "episodeNotes");
-  await addDoc(notesRef, noteData);
+
+  if (showType === "tv") {
+    const notesRef = collection(showRef, "episodes");
+    await addDoc(notesRef, noteData); // ✅ just use noteData
+  } else {
+    const notesRef = collection(showRef, "notes");
+    await addDoc(notesRef, noteData); // ✅ same here
+  }
 };
+
+
+
 
 // 🔹 Delete an episode note
-export const deleteEpisodeNote = async (showId, noteId) => {
-  const noteRef = doc(db, "watchlist", showId, "episodeNotes", noteId);
+export const deleteNote = async (showId, showType, noteId) => {
+  const showRef = doc(db, "watchlist", showId);
+  const noteRef = doc(
+    showRef,
+    showType === "tv" ? "episodes" : "notes",
+    noteId
+  );
   await deleteDoc(noteRef);
 };
 // Add a Show to Watchlist from Search

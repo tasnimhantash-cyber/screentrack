@@ -12,6 +12,8 @@ import AutoResizeTextarea from "../components/AutoResizeTextarea";
 import ShowCard from "../components/ShowCard";
 
 
+
+
 console.log("⭐ StarRating import check:", StarRating);
 console.log("📝 AutoResizeTextarea import check:", AutoResizeTextarea);
 

@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   getShowWithNotes,
-  addEpisodeNote,
-  deleteEpisodeNote,
+  addNote,
+  deleteNote,
 } from "../services/firestore";
-import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { getSeasons, getEpisodes } from "../services/tmdb";
+import { doc, updateDoc, getDoc, collection, getDocs } from "firebase/firestore";
+
 
 
 function ShowNotes() {
@@ -20,6 +21,29 @@ function ShowNotes() {
   const [episodes, setEpisodes] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedEpisode, setSelectedEpisode] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const showRef = doc(db, "watchlist", id);
+      const showSnap = await getDoc(showRef);
+
+      if (showSnap.exists()) {
+        const data = { id: showSnap.id, ...showSnap.data() };
+        setShowData(data);
+
+        // ✅ Pick correct collection depending on type
+        const notesCollection = collection(
+          showRef,
+          data.type === "tv" ? "episodes" : "notes"
+        );
+
+        const notesSnap = await getDocs(notesCollection);
+        setNotes(notesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
 useEffect(() => {
   if (showData && showData.tmdbId) { // assuming you store tmdbId in Firestore
@@ -55,34 +79,45 @@ const handleSeasonChange = async (seasonNumber) => {
 
 const handleAddNote = async () => {
   if (!noteText.trim()) return;
+
   try {
-    await addEpisodeNote(id, {
-      text: noteText,
-       season: selectedSeason,
-      episode: selectedEpisode,
-      createdAt: new Date().toISOString(),
-    });
+    // choose what data to send based on show type
+    const noteData =
+      showData?.type === "tv"
+        ? {
+            season: selectedSeason,
+            episode: selectedEpisode,
+            noteText,
+            createdAt: new Date().toISOString(),
+          }
+        : {
+            noteText,
+            createdAt: new Date().toISOString(),
+          };
+
+    await addNote(id, showData?.type, noteData);
+
+    // clear form
     setNoteText("");
     setSelectedSeason("");
     setSelectedEpisode("");
     setEpisodes([]);
+
+    // refresh notes
     fetchShowData();
   } catch (error) {
     console.error("Error adding note:", error);
-  }
-
-};
-
-
+  }};
 
 const handleDeleteNote = async (noteId) => {
   try {
-    await deleteEpisodeNote(id, noteId);
+    await deleteNote(id, showData?.type, noteId); 
     fetchShowData(); // refresh list
   } catch (error) {
     console.error("Error deleting note:", error);
   }
 };
+
 
   const updateShowDate = async (field, value) => {
     try {
@@ -400,9 +435,33 @@ const deleteRewatch = async (indexToDelete) => {
       <p>⭐ Rating: {showData.rating || "No rating yet"}</p>
 
       {renderDateSection()}
-    <h3>📝 Notes by Season</h3>
-{/* 📁 Organized by Season */}
-{notes.length > 0 ? (
+  <h2>📝 {showData?.type === "tv" ? "Notes by Season" : "Notes"}</h2>
+
+{/* 🎬 Flat list for movies */}
+{showData?.type === "movie" && (
+  <ul>
+    {notes.map((n) => (
+      <li key={n.id}>
+        {n.noteText}
+        <button
+          onClick={() => handleDeleteNote(n.id)}
+          style={{
+            marginLeft: "8px",
+            background: "none",
+            border: "none",
+            color: "#d9534f",
+            cursor: "pointer",
+          }}
+        >
+          🗑
+        </button>
+      </li>
+    ))}
+  </ul>
+)}
+
+{/* 📺 Grouped by season — TV shows only */}
+{showData?.type === "tv" && notes.length > 0 ? (
   Object.entries(
     notes.reduce((acc, note) => {
       const season = note.season ? `Season ${note.season}` : "Misc Notes";
@@ -426,10 +485,7 @@ const deleteRewatch = async (indexToDelete) => {
       <ul style={{ paddingLeft: "20px", marginTop: "6px" }}>
         {seasonNotes.map((note) => (
           <li key={note.id} style={{ marginBottom: "6px" }}>
-            <strong>
-              Ep {note.episode || "—"}:
-            </strong>{" "}
-            {note.text}
+            <strong>Ep {note.episode || "—"}:</strong> {note.noteText}
             <button
               onClick={() => handleDeleteNote(note.id)}
               style={{
@@ -448,12 +504,14 @@ const deleteRewatch = async (indexToDelete) => {
     </details>
   ))
 ) : (
-  <p>No notes yet.</p>
+  showData?.type === "tv" && <p>No notes yet.</p>
 )}
 
 
 
+
 {/* 🎬 Select Season & Episode */}
+{showData?.type === "tv" && (
 <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
   <select
     value={selectedSeason}
@@ -492,7 +550,7 @@ const deleteRewatch = async (indexToDelete) => {
     ))}
   </select>
 </div>
-
+)}
     <textarea
       placeholder="Add a new note..."
       value={noteText}
